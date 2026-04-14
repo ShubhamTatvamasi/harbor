@@ -13,6 +13,7 @@ helm upgrade -i harbor harbor/harbor \
   --set expose.type=loadBalancer \
   --set expose.tls.enabled=false \
   --set harborAdminPassword=admin \
-  --set persistence.persistentVolumeClaim.registry.size=20Gi
+  --set persistence.persistentVolumeClaim.registry.size=20Gi \
+  --set externalURL=http://core.harbor.domain
 ```
 
