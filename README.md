@@ -12,6 +12,7 @@ helm upgrade -i harbor harbor/harbor \
   --create-namespace \
   --set expose.type=loadBalancer \
   --set expose.tls.enabled=false \
-  --set harborAdminPassword=admin
+  --set harborAdminPassword=admin \
+  --set persistence.persistentVolumeClaim.registry.size=20Gi
 ```
 
