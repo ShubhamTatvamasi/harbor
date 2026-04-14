@@ -25,14 +25,34 @@ function ensure_command() {
 
 function choose_container_cli() {
   if command -v docker >/dev/null 2>&1; then
-    CONTAINER_CMD="docker"
+    CONTAINER_CMD="$(command -v docker)"
     return
   fi
   if command -v nerdctl >/dev/null 2>&1; then
-    CONTAINER_CMD="nerdctl"
+    CONTAINER_CMD="$(command -v nerdctl)"
     return
   fi
   fail "Neither docker nor nerdctl is installed. Install one of them to sync Docker images."
+}
+
+function container_cli_name() {
+  basename "$CONTAINER_CMD"
+}
+
+function run_container() {
+  if [[ "$(container_cli_name)" == nerdctl ]] && [[ "$(id -u)" -ne 0 ]]; then
+    sudo env "PATH=$PATH" "$CONTAINER_CMD" "$@"
+  else
+    "$CONTAINER_CMD" "$@"
+  fi
+}
+
+function dryrun_container() {
+  if [[ "$(container_cli_name)" == nerdctl ]] && [[ "$(id -u)" -ne 0 ]]; then
+    echo "sudo env \"PATH=$PATH\" $CONTAINER_CMD $*"
+  else
+    echo "$CONTAINER_CMD $*"
+  fi
 }
 
 function is_yaml_file() {
@@ -97,14 +117,14 @@ function derive_helm_target() {
 }
 
 function docker_desktop() {
-  [[ "$CONTAINER_CMD" != "docker" ]] && return 1
-  docker info 2>/dev/null | grep -qiE 'Docker Desktop|docker desktop'
+  [[ "$(container_cli_name)" != "docker" ]] && return 1
+  $CONTAINER_CMD info 2>/dev/null | grep -qiE 'Docker Desktop|docker desktop'
 }
 
 function docker_insecure_registry_exists() {
   local host="$1"
-  [[ "$CONTAINER_CMD" != "docker" ]] && return 1
-  docker info 2>/dev/null | awk '/Insecure Registries:/ {found=1; next} /^[^[:space:]]/ {found=0} found {print}' | grep -qE "(^|[[:space:]])${host}([[:space:]]|$)"
+  [[ "$(container_cli_name)" != "docker" ]] && return 1
+  $CONTAINER_CMD info 2>/dev/null | awk '/Insecure Registries:/ {found=1; next} /^[^[:space:]]/ {found=0} found {print}' | grep -qE "(^|[[:space:]])${host}([[:space:]]|$)"
 }
 
 function ensure_docker_insecure_registry() {
@@ -175,10 +195,10 @@ function docker_login_harbor() {
   fi
 
   if [[ "$DRY_RUN" == true ]]; then
-    echo "$CONTAINER_CMD login $HARBOR_HOST -u $HARBOR_USERNAME -p ********"
+    dryrun_container login "$HARBOR_HOST" -u "$HARBOR_USERNAME" -p ********
     return
   fi
-  echo "$HARBOR_PASSWORD" | $CONTAINER_CMD login "$HARBOR_HOST" -u "$HARBOR_USERNAME" --password-stdin
+  echo "$HARBOR_PASSWORD" | run_container login "$HARBOR_HOST" -u "$HARBOR_USERNAME" --password-stdin
 }
 
 function push_docker_image() {
@@ -192,15 +212,15 @@ function push_docker_image() {
   info "Mirroring Docker image: $source_pull -> $target_push"
 
   if [[ "$DRY_RUN" == true ]]; then
-    echo "$CONTAINER_CMD pull $source_pull"
-    echo "$CONTAINER_CMD tag $source_pull $target_push"
-    echo "$CONTAINER_CMD push $target_push"
+    dryrun_container pull "$source_pull"
+    dryrun_container tag "$source_pull" "$target_push"
+    dryrun_container push "$target_push"
     return
   fi
 
-  $CONTAINER_CMD pull "$source_pull"
-  $CONTAINER_CMD tag "$source_pull" "$target_push"
-  $CONTAINER_CMD push "$target_push"
+  run_container pull "$source_pull"
+  run_container tag "$source_pull" "$target_push"
+  run_container push "$target_push"
 }
 
 function ensure_config() {

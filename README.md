@@ -65,6 +65,8 @@ Example Docker Desktop JSON snippet:
 }
 ```
 
+If using `nerdctl`, the script will automatically run it via `sudo env "PATH=$PATH" nerdctl ...` when needed.
+
 Sync only Docker images:
 
 ```bash
