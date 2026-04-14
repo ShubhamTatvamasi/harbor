@@ -1,0 +1,31 @@
+harbor:
+  protocol: http
+  host: core.harbor.domain
+  username: admin
+  password: admin
+  project: test
+
+docker_images:
+  - docker.io/postgres:18.3
+  # - apache/airflow:3.1.8
+  # - apache/airflow:3.2.0
+  # - quay.io/prometheus/statsd-exporter:v0.29.0
+  # - redis:7.2-bookworm
+  # - apache/airflow:airflow-pgbouncer-2025.03.05-1.23.1
+  # - apache/airflow:airflow-pgbouncer-exporter-2025.03.05-0.18.0
+  # - registry.k8s.io/git-sync/git-sync:v4.4.2
+  # - docker.io/bitnamilegacy/postgresql:16.1.0-debian-11-r15
+  # - docker.io/bitnami/os-shell:11-debian-11-r91
+  # - docker.io/bitnami/postgres-exporter:0.15.0-debian-11-r2
+  # - docker.io/bitnami/postgresql:16.1.0-debian-11-r15
+
+oci_repos:
+  - oci://registry-1.docker.io/cloudpirates/postgres:0.19.0
+
+helm_repos:
+  - repo: https://airflow.apache.org/
+    chart: airflow
+    version: 1.20.0
+  - repo: https://bitnami-labs.github.io/sealed-secrets/
+    chart: sealed-secrets
+    version: 2.18.5
