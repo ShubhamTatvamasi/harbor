@@ -11,6 +11,7 @@ helm upgrade -i harbor harbor/harbor \
   --namespace harbor \
   --create-namespace \
   --set expose.type=loadBalancer \
-  --set expose.tls.enabled=false
+  --set expose.tls.enabled=false \
+  --set harborAdminPassword=admin
 ```
 
