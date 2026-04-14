@@ -9,6 +9,7 @@ Install harbor:
 ```bash
 helm upgrade -i harbor harbor/harbor \
   --namespace harbor \
-  --create-namespace
+  --create-namespace \
+  --set expose.type=loadBalancer
 ```
 
