@@ -17,3 +17,15 @@ helm upgrade -i harbor harbor/harbor \
   --set externalURL=http://core.harbor.domain
 ```
 
+
+http://core.harbor.domain
+
+ID / Password: `admin` / `admin`
+
+
+Update your `/etc/hosts` file:
+```bash
+➜ cat /etc/hosts | grep harbor
+10.10.10.10 core.harbor.domain
+```
+
