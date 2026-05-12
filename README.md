@@ -17,6 +17,22 @@ helm upgrade -i harbor harbor/harbor \
   --set externalURL=http://core.harbor.domain
 ```
 
+Install with Ingress:
+```bash
+helm upgrade -i harbor harbor/harbor \
+  --namespace harbor \
+  --create-namespace \
+  --set expose.type=ingress \
+  --set expose.tls.enabled=true \
+  --set expose.tls.certSource=secret \
+  --set expose.tls.secret.secretName=shubhamtatvamasi-tls \
+  --set expose.ingress.hosts.core=harbor.k8s.shubhamtatvamasi.com \
+  --set harborAdminPassword=admin \
+  --set persistence.persistentVolumeClaim.registry.size=20Gi \
+  --set externalURL=https://harbor.k8s.shubhamtatvamasi.com
+```
+
+
 http://core.harbor.domain
 
 ID / Password: `admin` / `admin`
