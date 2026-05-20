@@ -181,7 +181,7 @@ function docker_login_harbor() {
   info "Logging in to Harbor Docker registry $HARBOR_HOST"
 
   if [[ "$HARBOR_PROTOCOL" == "http" ]]; then
-    if [[ "$CONTAINER_CMD" == "docker" ]]; then
+    if [[ "$(container_cli_name)" == "docker" ]]; then
       if docker_insecure_registry_exists "$HARBOR_HOST"; then
         info "Docker insecure registry '$HARBOR_HOST' already configured."
       elif [[ "$ALLOW_HTTP" == true ]]; then
@@ -407,10 +407,6 @@ EOF
 function main() {
   parse_args "$@"
   ensure_command helm
-  if [[ "$SYNC_DOCKER" == true ]]; then
-    choose_container_cli
-    ensure_command "$CONTAINER_CMD"
-  fi
   ensure_config
 
   if [[ "$MODE_SELECTED" == false ]]; then
@@ -420,6 +416,8 @@ function main() {
   fi
 
   if [[ "$SYNC_DOCKER" == true && ${DOCKER_SOURCES+x} ]] && (( ${#DOCKER_SOURCES[@]} )); then
+    choose_container_cli
+    ensure_command "$CONTAINER_CMD"
     docker_login_harbor
     for source in "${DOCKER_SOURCES[@]}"; do
       target="$(derive_docker_target "$source")"
