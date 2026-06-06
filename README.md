@@ -1,5 +1,7 @@
 # harbor
 
+https://artifacthub.io/packages/helm/harbor/harbor
+
 Add harbor helm repo:
 ```bash
 helm repo add harbor https://helm.goharbor.io
